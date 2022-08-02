@@ -19,12 +19,13 @@ async function run() {
     try {
         await client.connect()
         const userCollection = client.db('taskla').collection('users');
+        const taskCollection = client.db('taskla').collection('tasks')
 
 
         app.get('/user', async (req, res) => {
             const users = await userCollection.find().toArray()
             res.send(users)
-        })
+        });
 
         app.put('/user/admin/:email', async (req, res) => {
             const email = req.params.email;
@@ -49,6 +50,11 @@ async function run() {
             res.send({ result, token });
         })
 
+        app.post('/tasks', async (req, res) => {
+            const newTask = req.body;
+            const result = await taskCollection.insertOne(newTask)
+            res.send(result)
+        })
     }
     finally {
 
