@@ -35,10 +35,17 @@ async function run() {
             res.send(users)
         })
 
-        });
+        // Get:answerScript 
+        // url: http://localhost:5000/answers 
+       app.get('/answers' , async(req,res) =>{
+            
+            const answerScript = await answerScriptCollection.find().toArray();
+            res.send(answerScript);
+       })
 
 
-        // answerScript submit
+        // POST: answerScript submit
+        // url: localhost:5000/answer
         app.post('/answer', async (req, res) => {
             const data = req.body;
             console.log(data);
@@ -46,6 +53,8 @@ async function run() {
             const result = await answerScriptCollection.insertOne(data);
             res.send(result);
         })
+
+        //END answerScript submit
 
         app.put('/user/admin/:email', async (req, res) => {
             const email = req.params.email;
