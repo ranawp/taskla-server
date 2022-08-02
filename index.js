@@ -20,10 +20,20 @@ async function run() {
         await client.connect()
         const userCollection = client.db('taskla').collection('users');
 
+        const answerScriptCollection = client.db('taskla').collection('answerScripts');
 
         app.get('/user', async (req, res) => {
             const users = await userCollection.find().toArray()
             res.send(users)
+        })
+
+        // answerScript submit
+        app.post('/answer', async (req, res) => {
+            const data = req.body;
+            console.log(data);
+
+            const result = await answerScriptCollection.insertOne(data);
+            res.send(result);
         })
 
         app.put('/user/admin/:email', async (req, res) => {
@@ -56,7 +66,7 @@ async function run() {
 }
 run().catch(console.dir)
 app.get('/', (req, res) => {
-    res.send('Hello world')
+    res.send('Hello world this is from taskla server')
 })
 
 
