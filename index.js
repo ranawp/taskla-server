@@ -32,9 +32,7 @@ async function run() {
             const filter = { email: email };
             const users = await userCollection.findOne(filter)
             res.send(users)
-        })
-
-        });
+        })  
 
 
         app.put('/user/admin/:email', async (req, res) => {
