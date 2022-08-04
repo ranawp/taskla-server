@@ -21,22 +21,19 @@ async function run() {
         const userCollection = client.db('taskla').collection('users');
         const taskCollection = client.db('taskla').collection('tasks')
 
-
+        // masud code
         app.get('/user', async (req, res) => {
             const users = await userCollection.find().toArray()
             res.send(users)
 
         })
+
         app.get('/user/:email', async (req, res) => {
             const email = req.params.email;
             const filter = { email: email };
             const users = await userCollection.findOne(filter)
             res.send(users)
         })
-
-        });
-
-
         app.put('/user/admin/:email', async (req, res) => {
             const email = req.params.email;
             const filter = { email: email };
@@ -50,7 +47,16 @@ async function run() {
             const email = req.params.email;
             const filter = { email: email };
             const updateDoc = {
-                $set: { student: 'paidStudent' },
+                $set: { student: 'enrolled' },
+            };
+            const result = await userCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+        app.put('/user/enroll/:email', async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const updateDoc = {
+                $set: { enroll: "enrollPending" },
             };
             const result = await userCollection.updateOne(filter, updateDoc);
             res.send(result);
@@ -86,6 +92,7 @@ async function run() {
             const result = await userCollection.insertOne(user)
             res.send(result)
         })
+        //masud code end
 
         app.post('/tasks', async (req, res) => {
             const newTask = req.body;
