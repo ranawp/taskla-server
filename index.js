@@ -131,11 +131,21 @@ async function run() {
             res.send(allTasks);
         });
 
+
+        // parvez Start
+
         app.post('/createBlog', async (req, res) => {
             const newBlog = req.body;
             const result = await blogCollection.insertOne(newBlog);
             res.send(result);
-        })
+        });
+
+        app.get('/createBlog', async (req, res) => {
+            const query = {};
+            const cursor = blogCollection.find(query);
+            const newBlog = await cursor.toArray();
+            res.send(newBlog);
+        });
     }
     finally {
 
