@@ -22,6 +22,7 @@ async function run() {
         const taskCollection = client.db('taskla').collection('tasks')
 
         const answerScriptCollection = client.db('taskla').collection('answerScripts');
+        const noticeCollection = client.db('taskla').collection('notices');
 
         app.get('/user', async (req, res) => {
             const users = await userCollection.find().toArray()
@@ -35,14 +36,17 @@ async function run() {
             res.send(users)
         })
 
-        // Get:answerScript 
+        
+
+       // hridoy 
+
+        // Get: answerScript 
         // url: http://localhost:5000/answers 
-       app.get('/answers' , async(req,res) =>{
+        app.get('/answers' , async(req,res) =>{
             
             const answerScript = await answerScriptCollection.find().toArray();
             res.send(answerScript);
        })
-
 
         // POST: answerScript submit
         // url: localhost:5000/answer
@@ -55,6 +59,26 @@ async function run() {
         })
 
         //END answerScript submit
+        
+        
+        // Post: Notice 
+        // url: localhost:5000/notice 
+        app.post('/notice', async(req,res) =>{
+            const data = req.body;
+            console.log(data);
+
+            const result = await noticeCollection.insertOne(data);
+            res.send(result);
+        })
+
+        // get: Notice 
+        // url: http://localhost:5000/notice
+        app.get('/notice', async(req,res)=>{
+            const notice = await (await noticeCollection.find().toArray()).reverse();
+            res.send(notice);
+        })
+
+        // end hridoy
 
         app.put('/user/admin/:email', async (req, res) => {
             const email = req.params.email;
