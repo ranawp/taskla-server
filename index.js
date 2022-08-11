@@ -21,7 +21,7 @@ async function run() {
         const userCollection = client.db('taskla').collection('users');
         const taskCollection = client.db('taskla').collection('tasks');
         const reviewCollection = client.db('taskla').collection('review');
-
+        const blogCollection = client.db('taskla').collection('blog');
         // masud code
         const answerScriptCollection = client.db('taskla').collection('answerScripts');
         const studentMarks = client.db('taskla').collection('studentMarks');
@@ -269,19 +269,28 @@ async function run() {
             res.send(result);
         })
 
-        // app.put('/answerSubmission/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const updateUser = req.body;
-        //     const filter = { _id: ObjectId(id) };
-        //     const options = { upsert: true };
-        //     const updateDoc = {
-        //         $set: updateUser,
-        //     };
-        //     console.log(updateUser)
-        //     const result = await taskCollection.updateOne(filter, updateDoc, options);
-        //     res.send(result);
-        // })
-        //rana end
+        // parvez Start
+        app.post('/createBlog', async (req, res) => {
+            const newBlog = req.body;
+            const result = await blogCollection.insertOne(newBlog);
+            res.send(result);
+        });
+
+        app.get('/createBlog', async (req, res) => {
+            const query = {};
+            const cursor = blogCollection.find(query);
+            const newBlog = await cursor.toArray();
+            res.send(newBlog);
+        });
+
+        app.get('/createBlog/:blogId', async (req, res) => {
+            const id = req.params.blogId;
+            console.log(id)
+            const query = { _id: ObjectId(id) };
+            const result = await blogCollection.findOne(query);
+            res.send(result);
+        });
+        // parvez End
     }
     finally {
 
