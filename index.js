@@ -20,9 +20,12 @@ async function run() {
         await client.connect()
         const userCollection = client.db('taskla').collection('users');
         const taskCollection = client.db('taskla').collection('tasks');
+        const reviewCollection = client.db('taskla').collection('review');
+
+        // masud code
         const answerScriptCollection = client.db('taskla').collection('answerScripts');
         const studentMarks = client.db('taskla').collection('studentMarks');
-
+        const noticeCollection = client.db('taskla').collection('notices');
 
         // masud code start 
         app.get('/user', async (req, res) => {
@@ -37,7 +40,64 @@ async function run() {
             res.send(users)
         })
 
+
         //admin roll set 
+
+
+
+        // hridoy 
+
+        // Get: answerScript 
+        // url: http://localhost:5000/answers 
+        app.get('/answers', async (req, res) => {
+            const answerScript = await answerScriptCollection.find().toArray();
+            res.send(answerScript);
+        })
+
+        // POST: answerScript submit
+        // url: localhost:5000/answer
+        app.post('/answer', async (req, res) => {
+            const data = req.body;
+            console.log(data);
+
+            const result = await answerScriptCollection.insertOne(data);
+            res.send(result);
+        })
+
+        //END answerScript submit
+
+
+        // Post: Notice 
+        // url: localhost:5000/notice 
+        app.post('/notice', async (req, res) => {
+            const data = req.body;
+            console.log(data);
+
+            const result = await noticeCollection.insertOne(data);
+            res.send(result);
+        })
+
+        // get: Notice 
+        // url: http://localhost:5000/notice
+        app.get('/notice', async (req, res) => {
+            const notice = await (await noticeCollection.find().toArray()).reverse();
+            res.send(notice);
+        })
+
+        // end hridoy
+        //Add review/Junayed 
+
+        app.post('/review', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        })
+
+        app.get('/review', async (req, res) => {
+            const review = await reviewCollection.find().toArray();
+            res.send(review);
+        })
+
         app.put('/user/admin/:email', async (req, res) => {
             const email = req.params.email;
             const filter = { email: email };
@@ -45,6 +105,17 @@ async function run() {
                 $set: { role: 'admin' },
             };
             const result = await userCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+        //notice
+        app.put('/notice/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id)
+            const filter = { _id: ObjectId(id) }
+            const updateDoc = {
+                $set: { read: true }
+            }
+            const result = await noticeCollection.updateOne(filter, updateDoc);
             res.send(result);
         })
 
@@ -147,7 +218,8 @@ async function run() {
             res.send(allTasks)
         })
 
-        //answer mark and feedback update 
+        //answer mark and feedback update///
+
 
         app.post('/studentMarks', async (req, res) => {
             const newMark = req.body;
@@ -164,6 +236,7 @@ async function run() {
 
         app.get('/allMarks/:email', async (req, res) => {
             const email = req.params.email;
+
             const filter = { email: email };
             const users = await studentMarks.find(filter)
             const allMarks = await users.toArray();
@@ -183,6 +256,18 @@ async function run() {
         //     const result = await answerScriptCollection.updateOne(filter, updateDoc);
         //     res.send(result);
         // })
+
+        app.put('/feedbackUpdate/:email', async (req, res) => {
+            const user = req.body;
+            const filter = { taskSerial: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user,
+            };
+            console.log(user)
+            const result = await taskCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
 
         // app.put('/answerSubmission/:id', async (req, res) => {
         //     const id = req.params.id;
