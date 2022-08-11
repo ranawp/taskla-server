@@ -19,13 +19,7 @@ async function run() {
     try {
         await client.connect()
         const userCollection = client.db('taskla').collection('users');
-<<<<<<< HEAD
-        const taskCollection = client.db('taskla').collection('tasks')
-
-        // masud code
-=======
         const taskCollection = client.db('taskla').collection('tasks');
->>>>>>> ef2d2f72d8bf64d8247a1554d36f81e080269ad8
         const answerScriptCollection = client.db('taskla').collection('answerScripts');
 
 
@@ -42,31 +36,7 @@ async function run() {
             res.send(users)
         })
 
-<<<<<<< HEAD
-        // Get:answerScript 
-        // url: http://localhost:5000/answers 
-        app.get('/answers', async (req, res) => {
-
-            const answerScript = await answerScriptCollection.find().toArray();
-            res.send(answerScript);
-        })
-
-
-        // POST: answerScript submit
-        // url: localhost:5000/answer
-        app.post('/answer', async (req, res) => {
-            const data = req.body;
-            console.log(data);
-
-            const result = await answerScriptCollection.insertOne(data);
-            res.send(result);
-        })
-
-        //END answerScript submit
-
-=======
         //admin roll set 
->>>>>>> ef2d2f72d8bf64d8247a1554d36f81e080269ad8
         app.put('/user/admin/:email', async (req, res) => {
             const email = req.params.email;
             const filter = { email: email };
@@ -83,18 +53,6 @@ async function run() {
             const filter = { email: email };
             const updateDoc = {
                 $set: { student: 'enrolled' },
-<<<<<<< HEAD
-            };
-            const result = await userCollection.updateOne(filter, updateDoc);
-            res.send(result);
-        })
-        app.put('/user/enroll/:email', async (req, res) => {
-            const email = req.params.email;
-            const filter = { email: email };
-            const updateDoc = {
-                $set: { enroll: "enrollPending" },
-=======
->>>>>>> ef2d2f72d8bf64d8247a1554d36f81e080269ad8
             };
             const result = await userCollection.updateOne(filter, updateDoc);
             res.send(result);
@@ -188,33 +146,33 @@ async function run() {
             res.send(allTasks)
         })
 
-        //answer mark and feedback update
+        //answer mark and feedback update///
 
         app.put('/feedbackUpdate/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body;
-            const filter = { email: email };
+            const filter = { taskSerial: email };
             const options = { upsert: true };
             const updateDoc = {
                 $set: user,
             };
             console.log(user)
-            const result = await answerScriptCollection.updateOne(filter, updateDoc);
+            const result = await taskCollection.updateOne(filter, updateDoc);
             res.send(result);
         })
 
-        app.put('/answerSubmission/:id', async (req, res) => {
-            const id = req.params.id;
-            const updateUser = req.body;
-            const filter = { _id: ObjectId(id) };
-            const options = { upsert: true };
-            const updateDoc = {
-                $set: updateUser,
-            };
-            console.log(updateUser)
-            const result = await taskCollection.updateOne(filter, updateDoc, options);
-            res.send(result);
-        })
+        // app.put('/answerSubmission/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const updateUser = req.body;
+        //     const filter = { _id: ObjectId(id) };
+        //     const options = { upsert: true };
+        //     const updateDoc = {
+        //         $set: updateUser,
+        //     };
+        //     console.log(updateUser)
+        //     const result = await taskCollection.updateOne(filter, updateDoc, options);
+        //     res.send(result);
+        // })
         //rana end
     }
     finally {
