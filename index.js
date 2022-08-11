@@ -154,6 +154,7 @@ async function run() {
             const mark = await studentMarks.insertOne(newMark)
             res.send(mark)
         })
+
         app.get('/allMarks', async (req, res) => {
             const query = {};
             const cursor = studentMarks.find(query);
@@ -164,8 +165,9 @@ async function run() {
         app.get('/allMarks/:email', async (req, res) => {
             const email = req.params.email;
             const filter = { email: email };
-            const users = await studentMarks.findOne(filter)
-            res.send(users)
+            const users = await studentMarks.find(filter)
+            const allMarks = await users.toArray();
+            res.send(allMarks)
         })
 
 
