@@ -22,6 +22,7 @@ async function run() {
         const taskCollection = client.db('taskla').collection('tasks');
         const reviewCollection = client.db('taskla').collection('review');
 
+        // masud code
         const answerScriptCollection = client.db('taskla').collection('answerScripts');
 
         app.get('/user', async (req, res) => {
@@ -29,6 +30,7 @@ async function run() {
             res.send(users)
 
         })
+
         app.get('/user/:email', async (req, res) => {
             const email = req.params.email;
             const filter = { email: email };
@@ -38,11 +40,11 @@ async function run() {
 
         // Get:answerScript 
         // url: http://localhost:5000/answers 
-       app.get('/answers' , async(req,res) =>{
-            
+        app.get('/answers', async (req, res) => {
+
             const answerScript = await answerScriptCollection.find().toArray();
             res.send(answerScript);
-       })
+        })
 
 
         // POST: answerScript submit
@@ -83,7 +85,16 @@ async function run() {
             const email = req.params.email;
             const filter = { email: email };
             const updateDoc = {
-                $set: { student: 'paidStudent' },
+                $set: { student: 'enrolled' },
+            };
+            const result = await userCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+        app.put('/user/enroll/:email', async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const updateDoc = {
+                $set: { enroll: "enrollPending" },
             };
             const result = await userCollection.updateOne(filter, updateDoc);
             res.send(result);
@@ -102,7 +113,6 @@ async function run() {
         })
         app.put('/update/:email', async (req, res) => {
             const email = req.params.email;
-            console.log(email)
             const user = req.body;
             const filter = { email: email };
             const options = { upsert: true };
@@ -119,6 +129,7 @@ async function run() {
             const result = await userCollection.insertOne(user)
             res.send(result)
         })
+        //masud code end
 
         app.post('/tasks', async (req, res) => {
             const newTask = req.body;
