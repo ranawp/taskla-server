@@ -19,7 +19,8 @@ async function run() {
     try {
         await client.connect()
         const userCollection = client.db('taskla').collection('users');
-        const taskCollection = client.db('taskla').collection('tasks')
+        const taskCollection = client.db('taskla').collection('tasks');
+        const blogCollection = client.db('taskla').collection('blog');
 
         // masud code
         const answerScriptCollection = client.db('taskla').collection('answerScripts');
@@ -127,7 +128,13 @@ async function run() {
             const query = {};
             const cursor = taskCollection.find(query);
             const allTasks = await cursor.toArray();
-            res.send(allTasks)
+            res.send(allTasks);
+        });
+
+        app.post('/createBlog', async (req, res) => {
+            const newBlog = req.body;
+            const result = await blogCollection.insertOne(newBlog);
+            res.send(result);
         })
     }
     finally {
@@ -142,4 +149,4 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log('starting express', port)
-})
+});
