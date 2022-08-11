@@ -21,6 +21,7 @@ async function run() {
         const userCollection = client.db('taskla').collection('users');
         const taskCollection = client.db('taskla').collection('tasks');
         const answerScriptCollection = client.db('taskla').collection('answerScripts');
+        const studentMarks = client.db('taskla').collection('studentMarks');
 
 
         // masud code start 
@@ -146,33 +147,53 @@ async function run() {
             res.send(allTasks)
         })
 
-        //answer mark and feedback update
+        //answer mark and feedback update 
 
-        app.put('/feedbackUpdate/:email', async (req, res) => {
+        app.post('/studentMarks', async (req, res) => {
+            const newMark = req.body;
+            const mark = await studentMarks.insertOne(newMark)
+            res.send(mark)
+        })
+        app.get('/allMarks', async (req, res) => {
+            const query = {};
+            const cursor = studentMarks.find(query);
+            const allMarks = await cursor.toArray();
+            res.send(allMarks)
+        })
+
+        app.get('/allMarks/:email', async (req, res) => {
             const email = req.params.email;
-            const user = req.body;
             const filter = { email: email };
-            const options = { upsert: true };
-            const updateDoc = {
-                $set: user,
-            };
-            console.log(user)
-            const result = await answerScriptCollection.updateOne(filter, updateDoc);
-            res.send(result);
+            const users = await studentMarks.findOne(filter)
+            res.send(users)
         })
 
-        app.put('/answerSubmission/:id', async (req, res) => {
-            const id = req.params.id;
-            const updateUser = req.body;
-            const filter = { _id: ObjectId(id) };
-            const options = { upsert: true };
-            const updateDoc = {
-                $set: updateUser,
-            };
-            console.log(updateUser)
-            const result = await taskCollection.updateOne(filter, updateDoc, options);
-            res.send(result);
-        })
+
+        // app.put('/feedbackUpdate/:email', async (req, res) => {
+        //     const email = req.params.email;
+        //     const user = req.body;
+        //     const filter = { email: email };
+        //     const options = { upsert: true };
+        //     const updateDoc = {
+        //         $set: user,
+        //     };
+        //     console.log(user)
+        //     const result = await answerScriptCollection.updateOne(filter, updateDoc);
+        //     res.send(result);
+        // })
+
+        // app.put('/answerSubmission/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const updateUser = req.body;
+        //     const filter = { _id: ObjectId(id) };
+        //     const options = { upsert: true };
+        //     const updateDoc = {
+        //         $set: updateUser,
+        //     };
+        //     console.log(updateUser)
+        //     const result = await taskCollection.updateOne(filter, updateDoc, options);
+        //     res.send(result);
+        // })
         //rana end
     }
     finally {
