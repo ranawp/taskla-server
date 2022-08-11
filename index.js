@@ -19,8 +19,10 @@ async function run() {
     try {
         await client.connect()
         const userCollection = client.db('taskla').collection('users');
-        const taskCollection = client.db('taskla').collection('tasks')
+        const taskCollection = client.db('taskla').collection('tasks');
+        const reviewCollection = client.db('taskla').collection('review');
 
+        const answerScriptCollection = client.db('taskla').collection('answerScripts');
 
         app.get('/user', async (req, res) => {
             const users = await userCollection.find().toArray()
@@ -32,8 +34,41 @@ async function run() {
             const filter = { email: email };
             const users = await userCollection.findOne(filter)
             res.send(users)
-        })  
+        })
 
+        // Get:answerScript 
+        // url: http://localhost:5000/answers 
+       app.get('/answers' , async(req,res) =>{
+            
+            const answerScript = await answerScriptCollection.find().toArray();
+            res.send(answerScript);
+       })
+
+
+        // POST: answerScript submit
+        // url: localhost:5000/answer
+        app.post('/answer', async (req, res) => {
+            const data = req.body;
+            console.log(data);
+
+            const result = await answerScriptCollection.insertOne(data);
+            res.send(result);
+        })
+
+        //END answerScript submit
+
+        //Add review/Junayed 
+
+        app.post('/review', async(req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        })
+
+        app.get('/review', async(req, res) => {
+            const review = await reviewCollection.find().toArray();
+            res.send(review);
+        })
 
         app.put('/user/admin/:email', async (req, res) => {
             const email = req.params.email;
@@ -104,7 +139,7 @@ async function run() {
 }
 run().catch(console.dir)
 app.get('/', (req, res) => {
-    res.send('Hello world')
+    res.send('Hello world this is from taskla server')
 })
 
 
