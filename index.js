@@ -5,7 +5,7 @@ const cors = require('cors')
 
 require('dotenv').config()
 const port = process.env.PORT || 5000
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 //middelware
 app.use(cors());
@@ -146,6 +146,15 @@ async function run() {
             const newBlog = await cursor.toArray();
             res.send(newBlog);
         });
+
+        app.get('/createBlog/:blogId', async (req, res) => {
+            const id = req.params.blogId;
+            console.log(id)
+            const query = { _id: ObjectId(id) };
+            const result = await blogCollection.findOne(query);
+            res.send(result);
+        });
+        // parvez End
     }
     finally {
 
