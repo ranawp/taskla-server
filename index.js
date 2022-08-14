@@ -20,10 +20,12 @@ async function run() {
         await client.connect()
         const userCollection = client.db('taskla').collection('users');
         const taskCollection = client.db('taskla').collection('tasks');
+        const reviewCollection = client.db('taskla').collection('review');
+        const blogCollection = client.db('taskla').collection('blog');
+        // masud code
         const answerScriptCollection = client.db('taskla').collection('answerScripts');
 
         const noticeCollection = client.db('taskla').collection('notices');
-
         const studentMarks = client.db('taskla').collection('studentMarks');
 
 
@@ -41,16 +43,13 @@ async function run() {
             res.send(users)
         })
 
-        
-       // hridoy 
-
+        // hridoy 
         // Get: answerScript 
         // url: http://localhost:5000/answers 
-        app.get('/answers' , async(req,res) =>{
-            
+        app.get('/answers', async (req, res) => {
             const answerScript = await answerScriptCollection.find().toArray();
             res.send(answerScript);
-       })
+        })
 
         // POST: answerScript submit
         // url: localhost:5000/answer
@@ -63,11 +62,11 @@ async function run() {
         })
 
         //END answerScript submit
-        
-        
+
+
         // Post: Notice 
         // url: localhost:5000/notice 
-        app.post('/notice', async(req,res) =>{
+        app.post('/notice', async (req, res) => {
             const data = req.body;
             console.log(data);
 
@@ -77,15 +76,27 @@ async function run() {
 
         // get: Notice 
         // url: http://localhost:5000/notice
-        app.get('/notice', async(req,res)=>{
+        app.get('/notice', async (req, res) => {
             const notice = await (await noticeCollection.find().toArray()).reverse();
             res.send(notice);
         })
 
         // end hridoy
+        //Add review/Junayed 
 
+        app.post('/review', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        })
+
+        app.get('/review', async (req, res) => {
+            const review = await reviewCollection.find().toArray();
+            res.send(review);
+        })
 
         //admin roll set 
+
 
         app.put('/user/admin/:email', async (req, res) => {
             const email = req.params.email;
@@ -94,6 +105,17 @@ async function run() {
                 $set: { role: 'admin' },
             };
             const result = await userCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+        //notice
+        app.put('/notice/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id)
+            const filter = { _id: ObjectId(id) }
+            const updateDoc = {
+                $set: { read: true }
+            }
+            const result = await noticeCollection.updateOne(filter, updateDoc);
             res.send(result);
         })
 
@@ -196,13 +218,15 @@ async function run() {
             res.send(allTasks)
         })
 
-        //answer mark and feedback update 
+        //answer mark and feedback update///
+
 
         app.post('/studentMarks', async (req, res) => {
             const newMark = req.body;
             const mark = await studentMarks.insertOne(newMark)
             res.send(mark)
         })
+
         app.get('/allMarks', async (req, res) => {
             const query = {};
             const cursor = studentMarks.find(query);
@@ -212,7 +236,9 @@ async function run() {
 
         app.get('/allMarks/:email', async (req, res) => {
             const email = req.params.email;
+
             const filter = { email: email };
+
             const users = await studentMarks.find(filter);
             const allMarks = await users.toArray();
             res.send(allMarks);
@@ -232,19 +258,40 @@ async function run() {
         //     res.send(result);
         // })
 
-        // app.put('/answerSubmission/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const updateUser = req.body;
-        //     const filter = { _id: ObjectId(id) };
-        //     const options = { upsert: true };
-        //     const updateDoc = {
-        //         $set: updateUser,
-        //     };
-        //     console.log(updateUser)
-        //     const result = await taskCollection.updateOne(filter, updateDoc, options);
-        //     res.send(result);
-        // })
-        //rana end
+        app.put('/feedbackUpdate/:email', async (req, res) => {
+            const user = req.body;
+            const filter = { taskSerial: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user,
+            };
+            console.log(user)
+            const result = await taskCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+
+        // parvez Start
+        app.post('/createBlog', async (req, res) => {
+            const newBlog = req.body;
+            const result = await blogCollection.insertOne(newBlog);
+            res.send(result);
+        });
+
+        app.get('/createBlog', async (req, res) => {
+            const query = {};
+            const cursor = blogCollection.find(query);
+            const newBlog = await cursor.toArray();
+            res.send(newBlog);
+        });
+
+        app.get('/createBlog/:blogId', async (req, res) => {
+            const id = req.params.blogId;
+            console.log(id)
+            const query = { _id: ObjectId(id) };
+            const result = await blogCollection.findOne(query);
+            res.send(result);
+        });
+        // parvez End
     }
     finally {
 
