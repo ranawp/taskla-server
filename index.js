@@ -5,7 +5,7 @@ const cors = require('cors')
 
 require('dotenv').config()
 const port = process.env.PORT || 5000
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 //middelware
 app.use(cors());
@@ -19,16 +19,21 @@ async function run() {
     try {
         await client.connect()
         const userCollection = client.db('taskla').collection('users');
-        const taskCollection = client.db('taskla').collection('tasks')
-
+        const taskCollection = client.db('taskla').collection('tasks');
         const answerScriptCollection = client.db('taskla').collection('answerScripts');
+
         const noticeCollection = client.db('taskla').collection('notices');
 
+        const studentMarks = client.db('taskla').collection('studentMarks');
+
+
+
+        // masud code start 
         app.get('/user', async (req, res) => {
             const users = await userCollection.find().toArray()
             res.send(users)
-
         })
+
         app.get('/user/:email', async (req, res) => {
             const email = req.params.email;
             const filter = { email: email };
@@ -37,7 +42,6 @@ async function run() {
         })
 
         
-
        // hridoy 
 
         // Get: answerScript 
@@ -80,6 +84,9 @@ async function run() {
 
         // end hridoy
 
+
+        //admin roll set 
+
         app.put('/user/admin/:email', async (req, res) => {
             const email = req.params.email;
             const filter = { email: email };
@@ -89,16 +96,30 @@ async function run() {
             const result = await userCollection.updateOne(filter, updateDoc);
             res.send(result);
         })
+
+        //enrolled 
         app.put('/user/student/:email', async (req, res) => {
             const email = req.params.email;
             const filter = { email: email };
             const updateDoc = {
-                $set: { student: 'paidStudent' },
+                $set: { student: 'enrolled' },
             };
             const result = await userCollection.updateOne(filter, updateDoc);
             res.send(result);
         })
 
+        //enroll pending 
+        app.put('/user/enroll/:email', async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const updateDoc = {
+                $set: { enroll: "enrollPending" },
+            };
+            const result = await userCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+
+        //view profile  
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body;
@@ -110,9 +131,10 @@ async function run() {
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
             res.send({ result, token });
         })
+
+        //edit profile 
         app.put('/update/:email', async (req, res) => {
             const email = req.params.email;
-            console.log(email)
             const user = req.body;
             const filter = { email: email };
             const options = { upsert: true };
@@ -129,7 +151,38 @@ async function run() {
             const result = await userCollection.insertOne(user)
             res.send(result)
         })
+        //masud code end
 
+
+
+        // POST: answerScript submit
+        // url: localhost:5000/answer
+        app.post('/answer', async (req, res) => {
+            const data = req.body;
+            console.log(data);
+
+            const result = await answerScriptCollection.insertOne(data);
+            res.send(result);
+        })
+
+        // Get:answerScript 
+        // url: http://localhost:5000/answers 
+        app.get('/answers', async (req, res) => {
+
+            const answerScript = await answerScriptCollection.find().toArray();
+            res.send(answerScript);
+        })
+
+        app.get('/answers/:email', async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const users = await answerScriptCollection.findOne(filter)
+            res.send(users)
+        })
+
+        //END answerScript submit
+
+        //rana start 
         app.post('/tasks', async (req, res) => {
             const newTask = req.body;
             const result = await taskCollection.insertOne(newTask)
@@ -142,6 +195,56 @@ async function run() {
             const allTasks = await cursor.toArray();
             res.send(allTasks)
         })
+
+        //answer mark and feedback update 
+
+        app.post('/studentMarks', async (req, res) => {
+            const newMark = req.body;
+            const mark = await studentMarks.insertOne(newMark)
+            res.send(mark)
+        })
+        app.get('/allMarks', async (req, res) => {
+            const query = {};
+            const cursor = studentMarks.find(query);
+            const allMarks = await cursor.toArray();
+            res.send(allMarks)
+        })
+
+        app.get('/allMarks/:email', async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const users = await studentMarks.find(filter);
+            const allMarks = await users.toArray();
+            res.send(allMarks);
+        })
+
+
+        // app.put('/feedbackUpdate/:email', async (req, res) => {
+        //     const email = req.params.email;
+        //     const user = req.body;
+        //     const filter = { email: email };
+        //     const options = { upsert: true };
+        //     const updateDoc = {
+        //         $set: user,
+        //     };
+        //     console.log(user)
+        //     const result = await answerScriptCollection.updateOne(filter, updateDoc);
+        //     res.send(result);
+        // })
+
+        // app.put('/answerSubmission/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const updateUser = req.body;
+        //     const filter = { _id: ObjectId(id) };
+        //     const options = { upsert: true };
+        //     const updateDoc = {
+        //         $set: updateUser,
+        //     };
+        //     console.log(updateUser)
+        //     const result = await taskCollection.updateOne(filter, updateDoc, options);
+        //     res.send(result);
+        // })
+        //rana end
     }
     finally {
 
