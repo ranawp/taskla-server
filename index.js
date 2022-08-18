@@ -162,21 +162,18 @@ async function run() {
 
         //-----------------rana start-------------------------------------//
 
-        //get answer //contribute with hridoy 
-        // app.get('/answers/:email', async (req, res) => {
-        //     const email = req.params.email;
-        //     const filter = { email: email };
-        //     const users = await answerScriptCollection.findOne(filter)
-        //     res.send(users)
-        // }) 
+        //get answers 
 
-        app.get('/answers/:email', async (req, res) => {
-            const email = req.params.email;
 
-            const filter = { email: email };
-            const users = await answerScriptCollection.find(filter)
-            const allMarks = await users.toArray();
-            res.send(allMarks)
+        app.put('/alltasks/:id', async (req, res) => {
+            const id = req.params.id;
+            const { submit } = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: { submit: submit },
+            };
+            const result = await taskCollection.updateOne(filter, updateDoc);
+            res.send(result);
         })
 
         //post task or assignment 
@@ -201,6 +198,7 @@ async function run() {
             res.send(mark)
         })
 
+        //get all the marks 
         app.get('/allMarks', async (req, res) => {
             const query = {};
             const cursor = studentMarks.find(query);
@@ -208,7 +206,7 @@ async function run() {
             res.send(allMarks)
         })
 
-        //get all the marks individually 
+        // student will get all the marks individually 
         app.get('/allMarks/:email', async (req, res) => {
             const email = req.params.email;
 
@@ -219,17 +217,17 @@ async function run() {
         })
 
         //feedback 
-        app.put('/feedbackUpdate/:email', async (req, res) => {
-            const user = req.body;
-            const filter = { taskSerial: email };
-            const options = { upsert: true };
-            const updateDoc = {
-                $set: user,
-            };
-            console.log(user)
-            const result = await taskCollection.updateOne(filter, updateDoc);
-            res.send(result);
-        })
+        // app.put('/feedbackUpdate/:email', async (req, res) => {
+        //     const user = req.body;
+        //     const filter = { taskSerial: email };
+        //     const options = { upsert: true };
+        //     const updateDoc = {
+        //         $set: user,
+        //     };
+        //     console.log(user)
+        //     const result = await taskCollection.updateOne(filter, updateDoc);
+        //     res.send(result);
+        // })
 
         //task submitted 
 
@@ -244,10 +242,23 @@ async function run() {
             res.send(result);
         })
 
-        //-----------------rana end-------------------------------// 
+        //feedback submited 
+        app.put('/answers/:id', async (req, res) => {
+            const id = req.params.id;
+            const { feedbackSubmit } = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: { feedbackSubmit: feedbackSubmit },
+            };
+            const result = await answerScriptCollection.updateOne(filter, updateDoc);
+            res.send(result);
+
+        })
+
+        //--------------------rana end---------------------------------------// 
 
 
-        //----------------Junayed start ---------------------------// 
+        //----------------------Junayed start ---------------------------// 
         //add review 
         app.post('/review', async (req, res) => {
             const review = req.body;
