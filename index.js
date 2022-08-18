@@ -43,6 +43,73 @@ async function run() {
             res.send(users)
         })
 
+        //admin roll set 
+
+
+
+        // hridoy 
+
+        // Get: answerScript 
+        // url: http://localhost:5000/answers 
+        app.get('/answers', async (req, res) => {
+            const answerScript = await answerScriptCollection.find().toArray();
+            res.send(answerScript);
+        })
+
+        // POST: answerScript submit
+        // url: localhost:5000/answer
+        app.post('/answer', async (req, res) => {
+            const data = req.body;
+            console.log(data);
+
+            const result = await answerScriptCollection.insertOne(data);
+            res.send(result);
+        })
+
+        //END answerScript submit
+
+
+        // Post: Notice 
+        // url: localhost:5000/notice 
+        app.post('/notice', async (req, res) => {
+            const data = req.body;
+            const result = await noticeCollection.insertOne(data);
+            res.send(result);
+        })
+
+        // get: Notice 
+        // url: http://localhost:5000/notice
+        app.get('/notice', async (req, res) => {
+            const notice = await (await noticeCollection.find().toArray()).reverse();
+            res.send(notice);
+        })
+
+        // get:announcement
+        app.get('/announcement', async(req, res) => {
+            const announcementData = await noticeCollection.find({}).toArray();
+            res.send(announcementData);
+        })
+
+        app.get('/announcement/:id', async(req, res) => {
+            const id = req.params.id;
+            const filter = {_id: ObjectId(id)};
+            const singleAnnounce = await noticeCollection.findOne(filter)
+            res.send(singleAnnounce);
+        })
+
+        // end hridoy
+        //Add review/Junayed 
+
+        app.post('/review', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        })
+
+        app.get('/review', async (req, res) => {
+            const review = await reviewCollection.find().toArray();
+            res.send(review);
+        })
         //admin roll set
         app.put('/user/admin/:email', async (req, res) => {
             const email = req.params.email;
