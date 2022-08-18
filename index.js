@@ -71,8 +71,6 @@ async function run() {
         // url: localhost:5000/notice 
         app.post('/notice', async (req, res) => {
             const data = req.body;
-            console.log(data);
-
             const result = await noticeCollection.insertOne(data);
             res.send(result);
         })
@@ -82,6 +80,19 @@ async function run() {
         app.get('/notice', async (req, res) => {
             const notice = await (await noticeCollection.find().toArray()).reverse();
             res.send(notice);
+        })
+
+        // get:announcement
+        app.get('/announcement', async(req, res) => {
+            const announcementData = await noticeCollection.find({}).toArray();
+            res.send(announcementData);
+        })
+
+        app.get('/announcement/:id', async(req, res) => {
+            const id = req.params.id;
+            const filter = {_id: ObjectId(id)};
+            const singleAnnounce = await noticeCollection.findOne(filter)
+            res.send(singleAnnounce);
         })
 
         // end hridoy
