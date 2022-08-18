@@ -27,11 +27,14 @@ async function run() {
         const studentMarks = client.db('taskla').collection('studentMarks');
         const noticeCollection = client.db('taskla').collection('notices');
 
-        // masud code start 
+        //----------------------- masud code start-----------------------// 
+
+        //get all users 
         app.get('/user', async (req, res) => {
             const users = await userCollection.find().toArray()
             res.send(users)
         })
+
 
         app.get('/user/:email', async (req, res) => {
             const email = req.params.email;
@@ -40,64 +43,7 @@ async function run() {
             res.send(users)
         })
 
-
-        //admin roll set 
-
-
-
-        // hridoy 
-
-        // Get: answerScript 
-        // url: http://localhost:5000/answers 
-        app.get('/answers', async (req, res) => {
-            const answerScript = await answerScriptCollection.find().toArray();
-            res.send(answerScript);
-        })
-
-        // POST: answerScript submit
-        // url: localhost:5000/answer
-        app.post('/answer', async (req, res) => {
-            const data = req.body;
-            console.log(data);
-
-            const result = await answerScriptCollection.insertOne(data);
-            res.send(result);
-        })
-
-        //END answerScript submit
-
-
-        // Post: Notice 
-        // url: localhost:5000/notice 
-        app.post('/notice', async (req, res) => {
-            const data = req.body;
-            console.log(data);
-
-            const result = await noticeCollection.insertOne(data);
-            res.send(result);
-        })
-
-        // get: Notice 
-        // url: http://localhost:5000/notice
-        app.get('/notice', async (req, res) => {
-            const notice = await (await noticeCollection.find().toArray()).reverse();
-            res.send(notice);
-        })
-
-        // end hridoy
-        //Add review/Junayed 
-
-        app.post('/review', async (req, res) => {
-            const review = req.body;
-            const result = await reviewCollection.insertOne(review);
-            res.send(result);
-        })
-
-        app.get('/review', async (req, res) => {
-            const review = await reviewCollection.find().toArray();
-            res.send(review);
-        })
-
+        //admin roll set
         app.put('/user/admin/:email', async (req, res) => {
             const email = req.params.email;
             const filter = { email: email };
@@ -107,6 +53,7 @@ async function run() {
             const result = await userCollection.updateOne(filter, updateDoc);
             res.send(result);
         })
+
         //notice
         app.put('/notice/:id', async (req, res) => {
             const id = req.params.id;
@@ -173,12 +120,36 @@ async function run() {
             const result = await userCollection.insertOne(user)
             res.send(result)
         })
-        //masud code end
+        //-----------------------masud end-------------------------//
 
 
 
-        // POST: answerScript submit
-        // url: localhost:5000/answer
+        //------------------ hridoy start-------------------------// 
+
+        // Post: Notice 
+        // url: localhost:5000/notice 
+        app.post('/notice', async (req, res) => {
+            const data = req.body;
+            console.log(data);
+
+            const result = await noticeCollection.insertOne(data);
+            res.send(result);
+        })
+
+        // get: Notice 
+        // url: http://localhost:5000/notice
+        app.get('/notice', async (req, res) => {
+            const notice = await (await noticeCollection.find().toArray()).reverse();
+            res.send(notice);
+        })
+
+        //answer script // contribute with rana
+        app.get('/answers', async (req, res) => {
+
+            const answerScript = await answerScriptCollection.find().toArray();
+            res.send(answerScript);
+        })
+        //post answer script // contribute with rana
         app.post('/answer', async (req, res) => {
             const data = req.body;
             console.log(data);
@@ -186,31 +157,33 @@ async function run() {
             const result = await answerScriptCollection.insertOne(data);
             res.send(result);
         })
+        // ---------------------------end hridoy----------------------------//
 
-        // Get:answerScript 
-        // url: http://localhost:5000/answers 
-        app.get('/answers', async (req, res) => {
 
-            const answerScript = await answerScriptCollection.find().toArray();
-            res.send(answerScript);
+        //-----------------rana start-------------------------------------//
+
+        //get answers 
+
+
+        app.put('/alltasks/:id', async (req, res) => {
+            const id = req.params.id;
+            const { submit } = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: { submit: submit },
+            };
+            const result = await taskCollection.updateOne(filter, updateDoc);
+            res.send(result);
         })
 
-        app.get('/answers/:email', async (req, res) => {
-            const email = req.params.email;
-            const filter = { email: email };
-            const users = await answerScriptCollection.findOne(filter)
-            res.send(users)
-        })
-
-        //END answerScript submit
-
-        //rana start 
+        //post task or assignment 
         app.post('/tasks', async (req, res) => {
             const newTask = req.body;
             const result = await taskCollection.insertOne(newTask)
             res.send(result)
         })
 
+        //post all the task 
         app.get('/alltasks', async (req, res) => {
             const query = {};
             const cursor = taskCollection.find(query);
@@ -218,15 +191,14 @@ async function run() {
             res.send(allTasks)
         })
 
-        //answer mark and feedback update///
-
-
+        //post answer mark by teacher 
         app.post('/studentMarks', async (req, res) => {
             const newMark = req.body;
             const mark = await studentMarks.insertOne(newMark)
             res.send(mark)
         })
 
+        //get all the marks 
         app.get('/allMarks', async (req, res) => {
             const query = {};
             const cursor = studentMarks.find(query);
@@ -234,6 +206,7 @@ async function run() {
             res.send(allMarks)
         })
 
+        // student will get all the marks individually 
         app.get('/allMarks/:email', async (req, res) => {
             const email = req.params.email;
 
@@ -243,39 +216,74 @@ async function run() {
             res.send(allMarks)
         })
 
-
+        //feedback 
         // app.put('/feedbackUpdate/:email', async (req, res) => {
-        //     const email = req.params.email;
         //     const user = req.body;
-        //     const filter = { email: email };
+        //     const filter = { taskSerial: email };
         //     const options = { upsert: true };
         //     const updateDoc = {
         //         $set: user,
         //     };
         //     console.log(user)
-        //     const result = await answerScriptCollection.updateOne(filter, updateDoc);
+        //     const result = await taskCollection.updateOne(filter, updateDoc);
         //     res.send(result);
         // })
 
-        app.put('/feedbackUpdate/:email', async (req, res) => {
-            const user = req.body;
-            const filter = { taskSerial: email };
-            const options = { upsert: true };
+        //task submitted 
+
+        app.put('/alltasks/:id', async (req, res) => {
+            const id = req.params.id;
+            const { submit } = req.body;
+            const filter = { _id: ObjectId(id) };
             const updateDoc = {
-                $set: user,
+                $set: { submit: submit },
             };
-            console.log(user)
             const result = await taskCollection.updateOne(filter, updateDoc);
             res.send(result);
         })
 
-        // parvez Start
+        //feedback submited 
+        app.put('/answers/:id', async (req, res) => {
+            const id = req.params.id;
+            const { feedbackSubmit } = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: { feedbackSubmit: feedbackSubmit },
+            };
+            const result = await answerScriptCollection.updateOne(filter, updateDoc);
+            res.send(result);
+
+        })
+
+        //--------------------rana end---------------------------------------// 
+
+
+        //----------------------Junayed start ---------------------------// 
+        //add review 
+        app.post('/review', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        })
+
+        //get all the review 
+        app.get('/review', async (req, res) => {
+            const review = await reviewCollection.find().toArray();
+            res.send(review);
+        })
+        //----------------Junayed end ---------------------------// 
+
+
+        //--------------------- parvez Start--------------------------//
+
+        //blog create 
         app.post('/createBlog', async (req, res) => {
             const newBlog = req.body;
             const result = await blogCollection.insertOne(newBlog);
             res.send(result);
         });
 
+        //get all blogs 
         app.get('/createBlog', async (req, res) => {
             const query = {};
             const cursor = blogCollection.find(query);
@@ -283,6 +291,7 @@ async function run() {
             res.send(newBlog);
         });
 
+        //single blog details 
         app.get('/createBlog/:blogId', async (req, res) => {
             const id = req.params.blogId;
             console.log(id)
@@ -290,7 +299,7 @@ async function run() {
             const result = await blogCollection.findOne(query);
             res.send(result);
         });
-        // parvez End
+        //--------------------- parvez end--------------------------//
     }
     finally {
 
