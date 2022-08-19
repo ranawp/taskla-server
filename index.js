@@ -254,6 +254,13 @@ async function run() {
             const result = await blogCollection.findOne(query);
             res.send(result);
         });
+
+        app.delete('/createBlog/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await blogCollection.deleteOne(query);
+            res.send(result);
+        })
         // parvez End
     }
     finally {
