@@ -85,14 +85,14 @@ async function run() {
         })
 
         // get:announcement
-        app.get('/announcement', async(req, res) => {
+        app.get('/announcement', async (req, res) => {
             const announcementData = await noticeCollection.find({}).toArray();
             res.send(announcementData);
         })
 
-        app.get('/announcement/:id', async(req, res) => {
+        app.get('/announcement/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = {_id: ObjectId(id)};
+            const filter = { _id: ObjectId(id) };
             const singleAnnounce = await noticeCollection.findOne(filter)
             res.send(singleAnnounce);
         })
@@ -232,6 +232,45 @@ async function run() {
         //get answers 
 
 
+
+        //post task or assignment 
+        app.post('/tasks', async (req, res) => {
+            const newTask = req.body;
+            const result = await taskCollection.insertOne(newTask)
+            res.send(result)
+        });
+
+        //get all the task in edit route  
+        app.get('/alltaskEdit', async (req, res) => {
+            const query = {};
+            const cursor = taskCollection.find(query);
+            const allTasks = await cursor.toArray();
+            res.send(allTasks)
+        });
+
+        //edit task 
+        app.put('/tasks/:id', async (req, res) => {
+            const id = req.params.id;
+            const { taskEdit } = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: { taskEdit: taskEdit },
+            };
+            const result = await taskCollection.updateOne(filter, updateDoc);
+            res.send(result);
+
+        })
+
+
+        //get all the task in student my task route 
+        app.get('/alltasks', async (req, res) => {
+            const query = {};
+            const cursor = taskCollection.find(query);
+            const allTasks = await cursor.toArray();
+            res.send(allTasks)
+        });
+
+        //get all task in my task route 
         app.put('/alltasks/:id', async (req, res) => {
             const id = req.params.id;
             const { submit } = req.body;
@@ -242,22 +281,6 @@ async function run() {
             const result = await taskCollection.updateOne(filter, updateDoc);
             res.send(result);
         })
-
-        //post task or assignment 
-        app.post('/tasks', async (req, res) => {
-            const newTask = req.body;
-            const result = await taskCollection.insertOne(newTask)
-            res.send(result)
-        })
-
-        //post all the task 
-        app.get('/alltasks', async (req, res) => {
-            const query = {};
-            const cursor = taskCollection.find(query);
-            const allTasks = await cursor.toArray();
-            res.send(allTasks)
-        })
-
         //post answer mark by teacher 
         app.post('/studentMarks', async (req, res) => {
             const newMark = req.body;
