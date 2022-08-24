@@ -251,13 +251,15 @@ async function run() {
         //edit task 
         app.put('/tasks/:id', async (req, res) => {
             const id = req.params.id;
-            const { taskEdit } = req.body;
+            const taskEdit = req.body;
             const filter = { _id: ObjectId(id) };
             const updateDoc = {
-                $set: { taskEdit: taskEdit },
+                $set: taskEdit,
             };
+            console.log(updateDoc)
             const result = await taskCollection.updateOne(filter, updateDoc);
             res.send(result);
+            console.log('result', result)
 
         })
 
