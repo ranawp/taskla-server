@@ -219,8 +219,6 @@ async function run() {
         //post answer script // contribute with rana
         app.post('/answer', async (req, res) => {
             const data = req.body;
-            console.log(data);
-
             const result = await answerScriptCollection.insertOne(data);
             res.send(result);
         })
@@ -239,6 +237,13 @@ async function run() {
             const result = await taskCollection.insertOne(newTask)
             res.send(result)
         });
+        // app.put('/tasks', async (req, res) => {
+        //     const id=req.params.id;
+        //     const newTask = req.body;
+        //     const filter = { _id: ObjectId(id) };
+        //     const result = await taskCollection.updateOne(newTask)
+        //     res.send(result)
+        // });
 
         //get all the task in edit route  
         app.get('/alltaskEdit', async (req, res) => {
@@ -251,10 +256,11 @@ async function run() {
         //edit task 
         app.put('/tasks/:id', async (req, res) => {
             const id = req.params.id;
-            const { taskEdit } = req.body;
+            const { video7 } = req.body;
+            // console.log(ModuleName)
             const filter = { _id: ObjectId(id) };
             const updateDoc = {
-                $set: { taskEdit: taskEdit },
+                $set: { video9: video7 },
             };
             const result = await taskCollection.updateOne(filter, updateDoc);
             res.send(result);
