@@ -15,6 +15,25 @@ app.use(express.json());
 const uri = "mongodb+srv://taskla:dAKGb6kYJLfMjHHj@cluster0.k7x5vob.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+
+//verify JWT
+function verifyJWT(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: 'unauthorized access' })
+    }
+    const token = authHeader.split(' ')[1]
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).send({ message: 'Forbidden' })
+        }
+        console.log('decoded', decoded)
+        req.decoded = decoded
+    })
+    console.log('inside verifyJWT', authHeader)
+    next()
+}
+
 async function run() {
     try {
         await client.connect()
@@ -28,6 +47,19 @@ async function run() {
         const noticeCollection = client.db('taskla').collection('notices');
 
         //----------------------- masud code start-----------------------// 
+
+        //assignment resubmit
+        app.put('/resubmit/:id', async (req, res) => {
+            const id = req.params.id;
+            const assignmentAnswer = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: assignmentAnswer,
+            };
+            const result = await answerScriptCollection.updateOne(filter, updateDoc);
+            res.send(result);
+
+        })
 
         //get all users 
         app.get('/user', async (req, res) => {
@@ -164,7 +196,7 @@ async function run() {
                 $set: user,
             };
             const result = await userCollection.updateOne(filter, updateDoc);
-            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
+            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
             res.send({ result, token });
         })
 
@@ -305,11 +337,10 @@ async function run() {
         // student will get all the marks individually 
         app.get('/allMarks/:email', async (req, res) => {
             const email = req.params.email;
-
             const filter = { email: email };
-            const users = await studentMarks.find(filter)
-            const allMarks = await users.toArray();
-            res.send(allMarks)
+            const users = await studentMarks.find(filter).toArray()
+
+            res.send(users)
         })
 
         //feedback 
