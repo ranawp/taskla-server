@@ -45,6 +45,7 @@ async function run() {
         const answerScriptCollection = client.db('taskla').collection('answerScripts');
         const studentMarks = client.db('taskla').collection('studentMarks');
         const noticeCollection = client.db('taskla').collection('notices');
+        const booksCollection = client.db('taskla').collection('books');
 
         //----------------------- masud code start-----------------------// 
 
@@ -254,6 +255,22 @@ async function run() {
             const result = await answerScriptCollection.insertOne(data);
             res.send(result);
         })
+
+        // post: Books Upload 
+        // url: http://localhost:5000/booksUpload
+        app.post('/booksUpload', async (req, res) => {
+            const data = req.body;
+            const result = await booksCollection.insertOne(data);
+            res.send(result);
+        })
+
+        // get: Books 
+        //url: http://localhost:5000/books
+        app.get('/books', async (req, res) => {
+            const review = await booksCollection.find().toArray();
+            res.send(review);
+        })
+
         // ---------------------------end hridoy----------------------------//
 
 
