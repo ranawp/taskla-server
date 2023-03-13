@@ -109,8 +109,8 @@ async function run() {
         // get: Books 
         //url: http://localhost:5000/books
         app.get('/books', async (req, res) => {
-            const review = await booksCollection.find().toArray();
-            res.send(review);
+            const books = await booksCollection.find().toArray();
+            res.send(books);
         })
 
 
